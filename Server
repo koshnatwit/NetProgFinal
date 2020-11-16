@@ -34,7 +34,7 @@ public class Server {
 			}
 			
 			int randomInt = rand.nextInt(100);
-			if (randomInt > 75) {
+			if (randomInt > 80) {
 				array[rand.nextInt(array.length)] = "";
 			}
 			
