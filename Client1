@@ -1,39 +1,55 @@
+package Final;
+
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
 
 class Client {
-		private void processRequest() throws Exception {
-			// Enter {quit} from console
-			Scanner s = new Scanner(System.in);
-			String quitMsg = s.nextLine();
+	static class WriteThread implements Runnable {
+		DataOutputStream outToServer;
+
+		public WriteThread(DataOutputStream outToServer) {
+			this.outToServer = outToServer;
+		}
+
+		public void run() {
+			try {
+				process();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			}
+		}
+		
+		private void process() throws Exception {
+			Scanner scnr = new Scanner(System.in);
+			String quitMsg = scnr.nextLine();
 			this.outToServer.writeBytes(quitMsg + "\r\n");
 		}
 	}
-	
+
 	public static void main(String argv[]) throws Exception {
 		Socket connectionSocket = new Socket("localhost", 12345);
 
 		DataOutputStream outToServer = new DataOutputStream(connectionSocket.getOutputStream());
 		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
-		
-		// Get welcome msg from server
+		Scanner scnr = new Scanner(System.in);
+
 		String welcomeMsg = inFromServer.readLine();
 		System.out.println(welcomeMsg);
-		
-		// Get hello msg from server
+		String name = scnr.nextLine();
+		outToServer.writeBytes(name + "\r\n");
+
 		String helloMsg = inFromServer.readLine();
 		System.out.println(helloMsg);
 
-		// Get msg from server
 		String serverMessage = null;
 		while (true) {
-			while ((serverMessage = inFromServer.readLine()) != null) { 
+			while ((serverMessage = inFromServer.readLine()) != null) {
 				if (serverMessage.equals("{quit}")) {
 					return;
 				}
-			
-				System.out.println(serverMessage);	
+
+				System.out.println(serverMessage);
 			}
 		}
 	}
