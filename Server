@@ -8,9 +8,11 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 import java.util.Random;
+import Final.LinkedList;
 
 public class Server {
-	private static Map<String, DataOutputStream> clients = new HashMap<>();
+	private static LinkedList<DataOutputStream> clients = new LinkedList<>();
+	private static String firstMessage;
 
 	static class ClientRequest implements Runnable {
 		Socket connectionSocket;
@@ -32,21 +34,22 @@ public class Server {
 			BufferedReader br = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 			DataOutputStream os = new DataOutputStream(connectionSocket.getOutputStream());
 			Random rand = new Random();
+			
+			Iterator <DataOutputStream> osIterator = clients.getIterator();
 
 			os.writeBytes("Welcome to \"Unscramble the Message\"! Enter your name: \r\n");
 			String clientName = br.readLine();
 			
 			os.writeBytes("Hello " + clientName + "! Type \"{quit}\" to exit.\r\n");
 
-			for (DataOutputStream outputStream : clients.values()) {
-				outputStream.writeBytes(clientName + " joined the game!m\r\n");
-			}
-
-			clients.put(clientName, os);
+			for (DataOutputStream outputStream : clients) {
+				outputStream.writeBytes(clientName + " joined the game!\r\n");
+				clients.add(outputStream);
+			}			
 
 			String clientMessage = null;
 			while (true) {
-				while ((clientMessage = br.readLine()) != "{quit}") {
+				while (((clientMessage = br.readLine()) != "{quit}") || osIterator.hasNext()) {
 					String[] array = clientMessage.split(" ");
 
 					// for loop code block influenced by
@@ -63,8 +66,19 @@ public class Server {
 						array[rand.nextInt(array.length)] = "";
 					}
 
-					// need to figure out how to send message to only next person in line
-					os.writeBytes(array.toString());
+					if (osIterator.hasNext()) {
+						DataOutputStream outputStream = osIterator.next();
+						outputStream.writeBytes(array.toString() + "\r\n");
+					}
+				}
+				if ((clientMessage = br.readLine()) == "{quit}") {
+					osIterator.remove();
+					os.writeBytes("You have left the game.\r\n");
+				}
+				else if (!osIterator.hasNext()) {
+					for (DataOutputStream outputStream : clients) {
+						outputStream.writeBytes("The original message was: " + firstMessage);
+					}
 				}
 			}
 		}
