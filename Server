@@ -59,8 +59,7 @@ public class Server {
 			String clientMessage = null;
 
 			while (true) {
-				
-				while ((!(clientMessage = br.readLine()).equals("{quit}")) && osIterator.hasNext()) {
+				while (((clientMessage = br.readLine()) != null) && osIterator.hasNext()) {
 					if (os.equals(clients.getFirstOs())) {
 						firstMessage = clientMessage;
 					}
