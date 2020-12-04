@@ -40,7 +40,7 @@ public class Server {
 			os.writeBytes("Welcome to \"Unscramble the Message\"! Enter your name: \r\n");
 			String clientName = br.readLine();
 
-			os.writeBytes("Hello " + clientName + "! Type \"{quit}\" to exit.\r\n");
+			os.writeBytes("Hello " + clientName + "!\r\n");
 
 			os.writeBytes(clientName + " joined the game!\r\n");
 			clients.add(os);
@@ -59,6 +59,7 @@ public class Server {
 			String clientMessage = null;
 
 			while (true) {
+				
 				while ((!(clientMessage = br.readLine()).equals("{quit}")) && osIterator.hasNext()) {
 					if (os.equals(clients.getFirstOs())) {
 						firstMessage = clientMessage;
@@ -92,12 +93,6 @@ public class Server {
 						outputStream.writeBytes("Message: " + scramble + "\r\n");
 					}
 				}
-//				if (clientMessage.equals("{quit}")) {
-//					clients.remove(os);
-//					// osIterator.remove();
-//					os.writeBytes("You have left the game.\r\n");
-//					return;
-//				}
 				lastMessage = clientMessage;
 				System.out.println("Last Message: " + lastMessage);
 				
