@@ -19,11 +19,13 @@ class Client {
 				System.out.println(e.getMessage());
 			}
 		}
-		
+
 		private void process() throws Exception {
 			Scanner scnr = new Scanner(System.in);
-			String quitMsg = scnr.nextLine();
-			this.outToServer.writeBytes(quitMsg + "\r\n");
+			while (true) {
+				String quitMsg = scnr.nextLine();
+				this.outToServer.writeBytes(quitMsg + "\r\n");
+			}
 		}
 	}
 
@@ -42,14 +44,18 @@ class Client {
 		String helloMsg = inFromServer.readLine();
 		System.out.println(helloMsg);
 
+		String roleMessage = inFromServer.readLine();
+		System.out.println(roleMessage);
+
+		WriteThread write = new WriteThread(outToServer);
+		Thread thread = new Thread(write);
+		thread.start();
+
 		String serverMessage = null;
 		while (true) {
 			while ((serverMessage = inFromServer.readLine()) != null) {
-				if (serverMessage.equals("{quit}")) {
-					return;
-				}
-
 				System.out.println(serverMessage);
+
 			}
 		}
 	}
