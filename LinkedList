@@ -1,0 +1,205 @@
+package Final;
+
+import Final.Node;
+
+import java.io.DataOutputStream;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+public class LinkedList<T> implements Iterable <DataOutputStream>{
+	private Node<DataOutputStream> firstNode;
+	private int numberOfEntries;
+
+	public LinkedList() {
+		firstNode = null;
+		numberOfEntries = 0;
+	}
+
+	public Node<DataOutputStream> getLastNode() {
+		Node<DataOutputStream> lastNode = firstNode;
+		if (lastNode != null) {
+			Node<DataOutputStream> nextNode = firstNode.getNext();
+			while (nextNode != null) {
+				lastNode = nextNode;
+				nextNode = nextNode.getNext();
+			}
+		}
+		return lastNode;
+	}
+
+	public void add(DataOutputStream newEntry) {
+		numberOfEntries++;
+		Node<DataOutputStream> lastNode = getLastNode();
+		Node<DataOutputStream> toAdd = new Node<>(newEntry);
+		if (lastNode == null)
+			firstNode = toAdd;
+		else
+			lastNode.setNext(toAdd);
+	}
+	
+	public DataOutputStream getFirstOs() {
+		return firstNode.getData();
+	}
+
+	public Node<DataOutputStream> getNodeAt(int position) {
+		assert (position >= 0 && position < numberOfEntries);
+		Node<DataOutputStream> currNode = firstNode;
+		for (int i = 0; i < position; i++)
+			currNode = currNode.getNext();
+		return currNode;
+	}
+
+	public void add(int newPosition, DataOutputStream newEntry) {
+		if (newPosition < 0 || newPosition > numberOfEntries)
+			throw new IndexOutOfBoundsException();
+		Node<DataOutputStream> toInsert = new Node<>(newEntry);
+		numberOfEntries++;
+		if (newPosition == 0) {
+			toInsert.setNext(firstNode);
+			firstNode = toInsert;
+			return;
+		}
+		Node<DataOutputStream> before = getNodeAt(newPosition - 1);
+		assert (before != null);
+		Node<DataOutputStream> after = before.getNext();
+		before.setNext(toInsert);
+		toInsert.setNext(after);
+	}
+
+	public boolean isEmpty() {
+		return numberOfEntries == 0;
+	}
+
+	public void clear() {
+		while (!isEmpty()) {
+			remove(0);
+		}
+		firstNode = null;
+	}
+
+	public DataOutputStream remove(int givenPosition) {
+		if (givenPosition < 0 || givenPosition >= getLength())
+			throw new IndexOutOfBoundsException();
+		DataOutputStream dataItem;
+		Node<DataOutputStream> nextNode;
+		numberOfEntries--;
+
+		if (givenPosition == 0) {
+			dataItem = firstNode.getData();
+			firstNode = firstNode.getNext();
+		} else {
+			Node<DataOutputStream> currNode = getNodeAt(givenPosition - 1);
+			nextNode = currNode.getNext();
+			assert (nextNode != null);
+			dataItem = nextNode.getData();
+			currNode.setNext(nextNode.getNext());
+		}
+		return dataItem;
+	}
+
+	public int getLength() {
+		return numberOfEntries;
+	}
+
+	public DataOutputStream getEntry(int givenPosition) {
+		if (givenPosition < 0 || givenPosition >= getLength())
+			throw new IndexOutOfBoundsException();
+		Node<DataOutputStream> currNode = getNodeAt(givenPosition);
+		return currNode.getData();
+	}
+
+	public boolean remove(DataOutputStream anEntry) {
+		Node<DataOutputStream> currNode = firstNode;
+		Node<DataOutputStream> prevNode = null;
+		while (currNode != null) {
+			if (anEntry.equals(currNode.getData())) {
+				numberOfEntries--;
+				if (prevNode == null) {
+					currNode = currNode.getNext();
+					firstNode = currNode;
+				} else {
+					prevNode.setNext(currNode.getNext());
+				}
+
+				return true;
+			} else {
+				prevNode = currNode;
+				currNode = currNode.getNext();
+			}
+		}
+		return false;
+	}
+
+	public Object[] toArray() {
+		Object[] result = new Object[numberOfEntries];
+		int idx = 0;
+		for (Node<DataOutputStream> currNode = firstNode; currNode != null; currNode = currNode.getNext())
+			result[idx++] = currNode.getData();
+		return result;
+	}
+
+	public DataOutputStream replace(int position, DataOutputStream anEntry) {
+		DataOutputStream removedEntry = getEntry(position);
+		remove(position);
+		add(position, anEntry);
+		return removedEntry;
+	}
+
+	@Override
+	public Iterator<DataOutputStream> iterator() {
+		return new IteratorForLList();
+	}
+	
+	public Iterator <DataOutputStream> getIterator() {
+		return iterator();
+	}
+	
+	private class IteratorForLList implements Iterator <DataOutputStream> {
+		private Node <DataOutputStream> nextNode;
+		private Node <DataOutputStream> currNode;
+		private Node <DataOutputStream> prevNode;
+		private boolean nextWasCalled = false;
+		
+		public IteratorForLList() {
+			if (firstNode == null) {
+				throw new IllegalArgumentException("No iteration on empty list");
+			}
+			nextNode = firstNode;
+			currNode = prevNode = null;
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return nextNode != null;
+		}
+
+		@Override
+		public DataOutputStream next() {
+			if (!hasNext()) {
+				throw new NoSuchElementException();
+			}
+			DataOutputStream result = nextNode.getData();
+			prevNode = currNode;
+			currNode = nextNode;
+			nextNode = nextNode.getNext();
+			nextWasCalled = true;
+			return result;
+		}
+		
+		public void remove() {
+			if (!nextWasCalled) {
+				throw new IllegalStateException("Illegal call to remove without call to next.");
+			}
+			if (prevNode != null) {
+				prevNode.setNext(nextNode);
+			}
+			else {
+				firstNode = nextNode;
+			}
+			currNode = prevNode;
+			
+			nextWasCalled = false;
+		}
+		
+	}
+}
