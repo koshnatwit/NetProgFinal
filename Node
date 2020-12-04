@@ -1,0 +1,28 @@
+package Final;
+
+import java.io.*;
+
+public class Node <T> {
+    private DataOutputStream data;
+    private Node<DataOutputStream> next;
+
+    public Node (DataOutputStream data) {
+        this.data = data;
+        next = null;
+    }
+
+    public DataOutputStream getData() {
+        return data;
+    }
+
+    public Node<DataOutputStream> getNext() {
+        return next;
+    }
+
+    public void setData (DataOutputStream data) {
+    	this.data = data;}
+
+    public void setNext(Node<DataOutputStream> next) {
+        this.next = next;
+    }
+}
