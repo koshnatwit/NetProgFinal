@@ -63,7 +63,7 @@ public class Server {
 					if (os.equals(clients.getFirstOs())) {
 						firstMessage = clientMessage;
 					}
-					// System.out.println("Message: " + clientMessage);
+					System.out.println("Message: " + clientMessage);
 					
 					if (osIterator.hasNext()) {
 						String[] array = clientMessage.split(" ");
@@ -89,14 +89,6 @@ public class Server {
 						}
 						String scramble = str.toString();
 
-//						if ((clients.getNodeAt(clients.getLength() - 1).getData()).equals(outputStream)) {
-//							lastMessage = br.readLine();
-//							break;
-//						}
-//						lastMessage = scramble;
-//						System.out.println(firstMessage);
-//						System.out.println(lastMessage);	
-
 						outputStream.writeBytes("Message: " + scramble + "\r\n");
 					}
 				}
@@ -107,15 +99,17 @@ public class Server {
 //					return;
 //				}
 				lastMessage = clientMessage;
-				System.out.println(lastMessage);
+				System.out.println("Last Message: " + lastMessage);
 				
 				for (DataOutputStream outputStream : clients) {
 					if (lastMessage.toUpperCase().equals(firstMessage.toUpperCase())) {
 						outputStream.writeBytes("The original message was: " + firstMessage + " \r\n");
-						outputStream.writeBytes("The unscramblers have won the game!");
+						outputStream.writeBytes("The final message was: " + lastMessage + " \r\n");
+						outputStream.writeBytes("You have won the game!\r\n");
 					} else {
 						outputStream.writeBytes("The original message was: " + firstMessage + " \r\n");
-						outputStream.writeBytes("The original messenger has won the game!");
+						outputStream.writeBytes("The final message was: " + lastMessage + " \r\n");
+						outputStream.writeBytes("You have lost the game!\r\n");
 					}
 				}
 			}
