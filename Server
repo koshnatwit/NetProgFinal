@@ -13,6 +13,8 @@ import Final.LinkedList;
 public class Server {
 	private static LinkedList<DataOutputStream> clients = new LinkedList<>();
 	private static String firstMessage;
+	private static String lastMessage;
+	private static Iterator<DataOutputStream> osIterator;
 
 	static class ClientRequest implements Runnable {
 		Socket connectionSocket;
@@ -34,50 +36,83 @@ public class Server {
 			BufferedReader br = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 			DataOutputStream os = new DataOutputStream(connectionSocket.getOutputStream());
 			Random rand = new Random();
-			
-			Iterator <DataOutputStream> osIterator = clients.getIterator();
 
 			os.writeBytes("Welcome to \"Unscramble the Message\"! Enter your name: \r\n");
 			String clientName = br.readLine();
-			
+
 			os.writeBytes("Hello " + clientName + "! Type \"{quit}\" to exit.\r\n");
 
-			for (DataOutputStream outputStream : clients) {
-				outputStream.writeBytes(clientName + " joined the game!\r\n");
-				clients.add(outputStream);
-			}			
+			os.writeBytes(clientName + " joined the game!\r\n");
+			clients.add(os);
+			System.out.println(clientName + " has joined the game!");
+			if (clients.getLength() == 1) {
+				os.writeBytes("You are first in line, the original messenger, input the first message: \r\n");
+
+			} else {
+				os.writeBytes(
+						"You are an unscrambler. Wait for a message to appear, and attempt to unscramble it.\r\n");
+			}
+
+			osIterator = clients.getIterator();
+			osIterator.next();
 
 			String clientMessage = null;
+
 			while (true) {
-				while (((clientMessage = br.readLine()) != "{quit}") || osIterator.hasNext()) {
-					String[] array = clientMessage.split(" ");
-
-					// for loop code block influenced by
-					// https://www.journaldev.com/32661/shuffle-array-java
-					for (int i = 0; i < array.length; i++) {
-						int randIndex = rand.nextInt(array.length);
-						String temp = array[randIndex];
-						array[randIndex] = array[i];
-						array[i] = temp;
+				while ((!(clientMessage = br.readLine()).equals("{quit}")) && osIterator.hasNext()) {
+					if (os.equals(clients.getFirstOs())) {
+						firstMessage = clientMessage;
 					}
-
-					int randomInt = rand.nextInt(100);
-					if (randomInt > 80) {
-						array[rand.nextInt(array.length)] = "";
-					}
-
+					// System.out.println("Message: " + clientMessage);
+					
 					if (osIterator.hasNext()) {
+						String[] array = clientMessage.split(" ");
+
+						// for loop code block influenced by
+						// https://www.journaldev.com/32661/shuffle-array-java
+						for (int i = 0; i < array.length; i++) {
+							int randIndex = rand.nextInt(array.length);
+							String temp = array[randIndex];
+							array[randIndex] = array[i];
+							array[i] = temp;
+						}
+
+						int randomInt = rand.nextInt(100);
+						if (randomInt > 80) {
+							array[rand.nextInt(array.length)] = "_____";
+						}
+
 						DataOutputStream outputStream = osIterator.next();
-						outputStream.writeBytes(array.toString() + "\r\n");
+						StringBuilder str = new StringBuilder();
+						for (String string : array) {
+							str.append(string + " ");
+						}
+						String scramble = str.toString();
+
+//						if ((clients.getNodeAt(clients.getLength() - 1).getData()).equals(outputStream)) {
+//							lastMessage = br.readLine();
+//							break;
+//						}
+//						lastMessage = scramble;
+//						System.out.println(firstMessage);
+//						System.out.println(lastMessage);	
+
+						outputStream.writeBytes("Message: " + scramble + "\r\n");
 					}
 				}
-				if ((clientMessage = br.readLine()) == "{quit}") {
-					osIterator.remove();
+				if ((clientMessage = br.readLine()).equals("{quit}")) {
+					clients.remove(os);
+					// osIterator.remove();
 					os.writeBytes("You have left the game.\r\n");
+					return;
 				}
-				else if (!osIterator.hasNext()) {
-					for (DataOutputStream outputStream : clients) {
-						outputStream.writeBytes("The original message was: " + firstMessage);
+
+				for (DataOutputStream outputStream : clients) {
+					outputStream.writeBytes("The original message was: " + firstMessage + "\r\n");
+					if (lastMessage.toUpperCase().equals(firstMessage.toUpperCase())) {
+						outputStream.writeBytes("The unscramblers have won the game!");
+					} else {
+						outputStream.writeBytes("The original messenger has won the game!");
 					}
 				}
 			}
