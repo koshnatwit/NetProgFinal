@@ -100,18 +100,21 @@ public class Server {
 						outputStream.writeBytes("Message: " + scramble + "\r\n");
 					}
 				}
-				if ((clientMessage = br.readLine()).equals("{quit}")) {
-					clients.remove(os);
-					// osIterator.remove();
-					os.writeBytes("You have left the game.\r\n");
-					return;
-				}
-
+//				if (clientMessage.equals("{quit}")) {
+//					clients.remove(os);
+//					// osIterator.remove();
+//					os.writeBytes("You have left the game.\r\n");
+//					return;
+//				}
+				lastMessage = clientMessage;
+				System.out.println(lastMessage);
+				
 				for (DataOutputStream outputStream : clients) {
-					outputStream.writeBytes("The original message was: " + firstMessage + "\r\n");
 					if (lastMessage.toUpperCase().equals(firstMessage.toUpperCase())) {
+						outputStream.writeBytes("The original message was: " + firstMessage + " \r\n");
 						outputStream.writeBytes("The unscramblers have won the game!");
 					} else {
+						outputStream.writeBytes("The original message was: " + firstMessage + " \r\n");
 						outputStream.writeBytes("The original messenger has won the game!");
 					}
 				}
