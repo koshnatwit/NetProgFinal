@@ -3,7 +3,14 @@ package Final;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-
+/**
+ * 
+ * @author Nicholas Kosh
+ * @author Scott Yuen
+ * 
+ * Client class with nested class WriteThread, used to initialize 
+ * each client and send/receive messages from the server
+ */
 class Client {
 	static class WriteThread implements Runnable {
 		DataOutputStream outToServer;
@@ -12,6 +19,7 @@ class Client {
 			this.outToServer = outToServer;
 		}
 
+		@Override
 		public void run() {
 			try {
 				process();
@@ -36,14 +44,17 @@ class Client {
 		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(connectionSocket.getInputStream()));
 		Scanner scnr = new Scanner(System.in);
 
+		//welcomes the user to the game
 		String welcomeMsg = inFromServer.readLine();
 		System.out.println(welcomeMsg);
 		String name = scnr.nextLine();
 		outToServer.writeBytes(name + "\r\n");
 
+		//informs the user they have joined the game
 		String helloMsg = inFromServer.readLine();
 		System.out.println(helloMsg);
 
+		//tells player which part they will play
 		String roleMessage = inFromServer.readLine();
 		System.out.println(roleMessage);
 
