@@ -13,5 +13,5 @@
   https://youtu.be/KPWH9fypndc
   
  # Contributors:
-  Nicholas Kosh, Developer
-  Scott Yuen, Developer
+  - Nicholas Kosh, Developer
+  - Scott Yuen, Developer
