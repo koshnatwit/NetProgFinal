@@ -97,7 +97,7 @@ public class Server {
 						// uses chance to decide whether a word will be 
 						// removed and replaced with a blank space
 						int randomInt = rand.nextInt(100);
-						if (randomInt > 80) {
+						if (randomInt > 55) {
 							array[rand.nextInt(array.length)] = "_____";
 						}
 
