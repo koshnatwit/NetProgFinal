@@ -12,7 +12,9 @@
 # Starting Up
 ## Installation and Set-Up
   1. Download Eclipse IDE
-  2. Clone the Repository and Import to Eclipse
+  2. Clone the Repository
+  3. Open Eclipse and Import the Repository
+  4. Open the Server and Client Files
 ## Run
   1. Clear Console
   2. Run Server
